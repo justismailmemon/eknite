@@ -1,20 +1,51 @@
-<!-- \src\components\atoms\Button.vue -->
 <template>
-  <button :type="type" :class="buttonClasses" @click="$emit('click')">
-    <Icon v-if="icon" :name="icon" class="mr-2" />
-    <slot />
+  <button
+    :type="type"
+    :class="buttonClasses"
+    :disabled="loading"
+    @click="$emit('click')"
+  >
+    <!-- Spinner -->
+    <svg
+      v-if="loading"
+      class="animate-spin h-5 w-5 mr-2 text-white"
+      xmlns="http://www.w3.org/2000/svg"
+      fill="none"
+      viewBox="0 0 24 24"
+    >
+      <circle
+        class="opacity-25"
+        cx="12"
+        cy="12"
+        r="10"
+        stroke="currentColor"
+        stroke-width="4"
+      ></circle>
+      <path
+        class="opacity-75"
+        fill="currentColor"
+        d="M4 12a8 8 0 018-8v4l3-3-3-3v4a8 8 0 00-8 8h4z"
+      ></path>
+    </svg>
+
+    <!-- Icon if provided -->
+    <Icon v-if="icon && !loading" :name="icon" class="mr-2" />
+
+    <!-- Slot content -->
+    <slot>{{ loading ? "Loading..." : "Button" }}</slot>
   </button>
 </template>
 
 <script setup>
 import { computed } from "vue";
-import Icon from './Icon.vue'  // Use your Icon atom
+import Icon from './Icon.vue'
 
 const props = defineProps({
   type: { type: String, default: "button" },
   variant: { type: String, default: "primary" },
   customClass: { type: String, default: "" },
-  icon: { type: String, default: null }, // pass Tabler icon **name string**
+  icon: { type: String, default: null },
+  loading: { type: Boolean, default: false }, 
 });
 
 const variantClasses = {
@@ -27,8 +58,8 @@ const variantClasses = {
 
 const buttonClasses = computed(
   () =>
-    `w-full py-3 rounded-lg transition duration-200 font-semibold flex items-center justify-center ${
+    `w-full py-3 rounded-lg transition duration-200 font-semibold flex items-center justify-center cursor-pointer ${
       variantClasses[props.variant] || variantClasses.primary
-    } ${props.customClass}`
+    } ${props.customClass} ${props.loading ? 'opacity-70 cursor-not-allowed' : ''}`
 );
 </script>

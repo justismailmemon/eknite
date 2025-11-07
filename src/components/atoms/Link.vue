@@ -2,7 +2,7 @@
 <template>
   <a
     :href="href"
-    :class="`text-blue-500 font-semibold hover:underline ${customClass}`"
+    :class="`text-blue-500 font-bold hover:underline ${customClass}`"
   >
     <slot />
   </a>
