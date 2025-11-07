@@ -23,11 +23,10 @@
       type="password"
       :error="errors.password"
     />
-    
+
     <Button type="submit" :loading="loading">Sign Up</Button>
   </form>
 </template>
-
 
 <script>
 import Input from "../atoms/Input.vue";
@@ -67,10 +66,9 @@ export default {
 
       try {
         await schema.validate(this.form, { abortEarly: false });
-        this.errors = {}; // Clear errors if valid
+        this.errors = {}; 
         return true;
       } catch (err) {
-        // Map validation errors
         this.errors = {};
         if (err.inner) {
           err.inner.forEach((e) => {
@@ -79,13 +77,13 @@ export default {
         } else if (err.path) {
           this.errors[err.path] = err.message;
         }
-        return false; // Validation failed
+        return false; 
       }
     },
 
     async handleSubmit() {
       const isValid = await this.validate();
-      if (!isValid) return; // STOP API if validation failed
+      if (!isValid) return;
 
       this.loading = true;
       try {

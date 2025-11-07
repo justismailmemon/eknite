@@ -5,7 +5,6 @@
     :disabled="loading"
     @click="$emit('click')"
   >
-    <!-- Spinner -->
     <svg
       v-if="loading"
       class="animate-spin h-5 w-5 mr-2 text-white"
@@ -28,10 +27,8 @@
       ></path>
     </svg>
 
-    <!-- Icon if provided -->
     <Icon v-if="icon && !loading" :name="icon" class="mr-2" />
 
-    <!-- Slot content -->
     <slot>{{ loading ? "Loading..." : "Button" }}</slot>
   </button>
 </template>

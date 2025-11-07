@@ -64,7 +64,7 @@ export default {
 
       try {
         await schema.validate(this.form, { abortEarly: false });
-        this.errors = {}; // Clear errors if valid
+        this.errors = {};
         return true;
       } catch (err) {
         this.errors = {};
@@ -75,20 +75,23 @@ export default {
         } else if (err.path) {
           this.errors[err.path] = err.message;
         }
-        return false; // Validation failed
+        return false;
       }
     },
 
     async handleSubmit() {
       const isValid = await this.validate();
-      if (!isValid) return; // STOP API if validation failed
+      if (!isValid) return;
 
       this.loading = true;
       try {
-        const response = await axios.post("http://localhost:5000/api/auth/login", {
-          email: this.form.email,
-          password: this.form.password,
-        });
+        const response = await axios.post(
+          "http://localhost:5000/api/auth/login",
+          {
+            email: this.form.email,
+            password: this.form.password,
+          }
+        );
 
         notify(response.data.message, "success");
 
