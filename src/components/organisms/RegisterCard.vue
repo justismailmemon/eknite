@@ -1,10 +1,10 @@
-<!-- \src\components\organisms\LoginCard.vue -->
+<!-- \src\components\organisms\Register.vue -->
 <template>
   <div class="w-full max-w-[500px] p-8 space-y-6 bg-white rounded-xl shadow-lg">
     <Text tag="h2" size="3xl" weight="bold" color="gray-800"
-      >Sign in to your account</Text
+      >Sign up to your account</Text
     >
-    <LoginForm />
+    <RegisterForm />
 
     <div class="flex items-center justify-center gap-2 text-gray-400">
       <Text class="border-b w-1/5"></Text>
@@ -18,7 +18,7 @@
     </div>
 
     <Text class="text-center text-sm text-gray-500">
-      Don't have an account? <Link href="/register">Sign Up</Link>
+      Don't have an account? <Link href="/login">Sign In</Link>
     </Text>
   </div>
 </template>
@@ -27,5 +27,5 @@
 import Text from "../atoms/Text.vue";
 import Link from "../atoms/Link.vue";
 import Button from "../atoms/Button.vue";
-import LoginForm from "../molecules/LoginForm.vue";
+import RegisterForm from "../molecules/RegisterForm.vue";
 </script>

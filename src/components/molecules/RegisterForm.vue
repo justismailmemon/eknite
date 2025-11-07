@@ -1,6 +1,14 @@
 <template>
   <form @submit.prevent="handleSubmit" class="space-y-5" novalidate>
     <Input
+      v-model="form.name"
+      label="Name"
+      placeholder="John Doe"
+      type="text"
+      :error="errors.name"
+    />
+
+    <Input
       v-model="form.email"
       label="Email"
       placeholder="you@example.com"
@@ -15,34 +23,28 @@
       type="password"
       :error="errors.password"
     />
-
-    <div class="flex items-center justify-between text-sm">
-      <Checkbox v-model="form.rememberMe">Remember me</Checkbox>
-      <Link href="#">Forgot password?</Link>
-    </div>
-
-    <Button type="submit" :loading="loading">Sign In</Button>
+    
+    <Button type="submit" :loading="loading">Sign Up</Button>
   </form>
 </template>
+
 
 <script>
 import Input from "../atoms/Input.vue";
 import Button from "../atoms/Button.vue";
-import Checkbox from "../atoms/Checkbox.vue";
-import Link from "../atoms/Link.vue";
 import axios from "axios";
 import { notify } from "../../utils/notify.js";
 import * as yup from "yup";
 
 export default {
-  components: { Input, Button, Checkbox, Link },
+  components: { Input, Button },
 
   data() {
     return {
       form: {
+        name: "",
         email: "",
         password: "",
-        rememberMe: false,
       },
       errors: {},
       loading: false,
@@ -52,6 +54,7 @@ export default {
   methods: {
     async validate() {
       const schema = yup.object().shape({
+        name: yup.string().required("Name is required"),
         email: yup
           .string()
           .email("Enter a valid email")
@@ -67,6 +70,7 @@ export default {
         this.errors = {}; // Clear errors if valid
         return true;
       } catch (err) {
+        // Map validation errors
         this.errors = {};
         if (err.inner) {
           err.inner.forEach((e) => {
@@ -85,18 +89,13 @@ export default {
 
       this.loading = true;
       try {
-        const response = await axios.post("http://localhost:5000/api/auth/login", {
-          email: this.form.email,
-          password: this.form.password,
-        });
-
+        const response = await axios.post(
+          "http://localhost:5000/api/auth/register",
+          this.form
+        );
         notify(response.data.message, "success");
-
-        if (this.form.rememberMe) {
-          localStorage.setItem("token", response.data.token);
-        }
       } catch (error) {
-        notify(error.response?.data?.message || "Login failed", "error");
+        notify(error.response?.data?.message || "Registration failed", "error");
       } finally {
         this.loading = false;
       }
