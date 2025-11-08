@@ -6,5 +6,5 @@
 </template>
 
 <script setup>
-import RegisterCard from '../components/organisms/RegisterCard.vue'
+import RegisterCard from '@/components/organisms/RegisterCard.vue'
 </script>

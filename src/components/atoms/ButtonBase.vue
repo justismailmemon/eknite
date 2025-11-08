@@ -1,3 +1,4 @@
+<!-- Button Component Atom -->
 <template>
   <button
     :type="type"
@@ -27,15 +28,12 @@
       ></path>
     </svg>
 
-    <Icon v-if="icon && !loading" :name="icon" class="mr-2" />
-
-    <slot>{{ loading ? "Loading..." : "Button" }}</slot>
+    <slot></slot>
   </button>
 </template>
 
 <script setup>
 import { computed } from "vue";
-import Icon from './Icon.vue'
 
 const props = defineProps({
   type: { type: String, default: "button" },
@@ -56,7 +54,7 @@ const variantClasses = {
 const buttonClasses = computed(
   () =>
     `w-full py-3 rounded-lg transition duration-200 font-semibold flex items-center justify-center cursor-pointer ${
-      variantClasses[props.variant] || variantClasses.primary
+      variantClasses[props.variant]
     } ${props.customClass} ${props.loading ? 'opacity-70 cursor-not-allowed' : ''}`
 );
 </script>

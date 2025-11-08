@@ -24,8 +24,8 @@
 </template>
 
 <script setup>
-import Text from "../atoms/Text.vue";
-import Link from "../atoms/Link.vue";
-import Button from "../atoms/Button.vue";
-import RegisterForm from "../molecules/RegisterForm.vue";
+import Text from "@/components/atoms/Text.vue";
+import Link from "@/components/atoms/Link.vue";
+import Button from "@/components/atoms/ButtonBase.vue";
+import RegisterForm from "@/components/molecules/RegisterForm.vue";
 </script>

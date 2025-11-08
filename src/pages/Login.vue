@@ -6,5 +6,5 @@
 </template>
 
 <script setup>
-import LoginCard from '../components/organisms/LoginCard.vue'
+import LoginCard from '@/components/organisms/LoginCard.vue'
 </script>

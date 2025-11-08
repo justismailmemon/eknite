@@ -5,7 +5,7 @@
       type="checkbox"
       :checked="modelValue"
       @change="$emit('update:modelValue', $event.target.checked)"
-      class="w-4 h-4 rounded border-gray-300 focus:ring-blue-500"
+      class="size-4 rounded border-gray-300 focus:ring-blue-500"
     />
     <span><slot /></span>
   </label>

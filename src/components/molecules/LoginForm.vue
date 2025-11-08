@@ -16,33 +16,31 @@
       :error="errors.password"
     />
 
-    <div class="flex items-center justify-between text-sm">
-      <Checkbox v-model="form.rememberMe">Remember me</Checkbox>
+    <div class="flex items-center justify-end text-sm">
       <Link href="#">Forgot password?</Link>
     </div>
 
     <Button type="submit" :loading="loading">Sign In</Button>
   </form>
 </template>
-
 <script>
-import Input from "../atoms/Input.vue";
-import Button from "../atoms/Button.vue";
-import Checkbox from "../atoms/Checkbox.vue";
-import Link from "../atoms/Link.vue";
+import Input from "@/components/atoms/Input.vue";
+import Button from "@/components/atoms/ButtonBase.vue";
+import Link from "@/components/atoms/Link.vue";
 import axios from "axios";
-import { notify } from "../../utils/notify.js";
+import { notify } from "@/utils/notify.js";
 import * as yup from "yup";
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 export default {
-  components: { Input, Button, Checkbox, Link },
+  components: { Input, Button, Link },
 
   data() {
     return {
       form: {
         email: "",
         password: "",
-        rememberMe: false,
       },
       errors: {},
       loading: false,
@@ -85,19 +83,15 @@ export default {
 
       this.loading = true;
       try {
-        const response = await axios.post(
-          "http://localhost:5000/api/auth/login",
-          {
-            email: this.form.email,
-            password: this.form.password,
-          }
-        );
+        const response = await axios.post(`${API_BASE_URL}/auth/login`, {
+          email: this.form.email,
+          password: this.form.password,
+        });
 
         notify(response.data.message, "success");
-
-        if (this.form.rememberMe) {
-          localStorage.setItem("token", response.data.token);
-        }
+        localStorage.setItem("token", response.data.token);
+        this.$router.push({ name: "Workspace" });
+        
       } catch (error) {
         notify(error.response?.data?.message || "Login failed", "error");
       } finally {
