@@ -1,24 +1,19 @@
 @import "tailwindcss";
 
-/* Custom colors like Tailwind classes */
-.bg-primary {
-  background-color: #B08F6C;
+:root {
+  --font-sans: "Poppins", ui-sans-serif, system-ui, -apple-system, "Segoe UI",
+    Roboto, "Helvetica Neue", Arial, "Noto Sans", "Apple Color Emoji",
+    "Segoe UI Emoji", "Segoe UI Symbol", "Noto Color Emoji";
 }
 
-.bg-secondary {
-  background-color: #6B7280;
+html,
+body,
+#app {
+  font-family: var(--font-sans);
 }
 
-.bg-danger {
-  background-color: #DC2626;
+@theme {
+  --color-primary: #234323;
+  --color-primary-dark: #1a2a1a;
+  --color-secondary: #ffffff; /* white */
 }
-
-.bg-success {
-  background-color: #16A34A;
-}
-
-/* Optional: text colors */
-.text-primary { color: #B08F6C; }
-.text-secondary { color: #6B7280; }
-.text-danger { color: #DC2626; }
-.text-success { color: #16A34A; }

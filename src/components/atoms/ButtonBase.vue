@@ -1,4 +1,3 @@
-<!-- Button Component Atom -->
 <template>
   <button
     :type="type"
@@ -38,23 +37,31 @@ import { computed } from "vue";
 const props = defineProps({
   type: { type: String, default: "button" },
   variant: { type: String, default: "primary" },
+
+  /** NEW PROP: control button width **/
+  width: { type: String, default: "w-full" },
+
   customClass: { type: String, default: "" },
   icon: { type: String, default: null },
-  loading: { type: Boolean, default: false }, 
+  loading: { type: Boolean, default: false },
 });
 
 const variantClasses = {
-  primary: "bg-blue-500 text-white hover:bg-blue-600",
-  secondary: "bg-gray-500 text-white hover:bg-gray-600",
-  success: "bg-green-500 text-white hover:bg-green-600",
+  primary: "bg-primary text-white hover:bg-primary-dark",
+  outline:
+    "border border-primary text-outline hover:border-primary-dark hover:text-primary-dark",
+
   danger: "bg-red-500 text-white hover:bg-red-600",
-  outline: "border border-gray-500 text-gray-500 hover:bg-gray-100",
 };
 
 const buttonClasses = computed(
   () =>
-    `w-full py-3 rounded-lg transition duration-200 font-semibold flex items-center justify-center cursor-pointer ${
+    `${
+      props.width
+    } py-3 rounded-lg transition duration-200 font-semibold flex items-center justify-center cursor-pointer ${
       variantClasses[props.variant]
-    } ${props.customClass} ${props.loading ? 'opacity-70 cursor-not-allowed' : ''}`
+    } ${props.customClass} ${
+      props.loading ? "opacity-70 cursor-not-allowed" : ""
+    }`
 );
 </script>

@@ -1,10 +1,11 @@
-<!-- \src\pages\Login.vue -->
+<!-- src/pages/Login.vue -->
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-gray-200">
+  <AuthTemplate>
     <LoginCard />
-  </div>
+  </AuthTemplate>
 </template>
 
 <script setup>
+import AuthTemplate from '@/components/templates/AuthTemplate.vue'
 import LoginCard from '@/components/organisms/LoginCard.vue'
 </script>

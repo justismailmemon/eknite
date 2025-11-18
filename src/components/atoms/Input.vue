@@ -17,7 +17,7 @@
         'w-full px-4 py-3 rounded-lg border focus:outline-none',
         error
           ? 'border-red-500'
-          : 'border-gray-300 focus:ring-blue-500 focus:ring-2',
+          : 'border-gray-300 focus:ring-primary focus:ring-2',
       ]"
     />
     <p v-if="error" class="text-red-500 text-sm mt-1">{{ error }}</p>

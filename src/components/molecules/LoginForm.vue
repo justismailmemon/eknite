@@ -16,17 +16,20 @@
       :error="errors.password"
     />
 
-    <div class="flex items-center justify-end text-sm">
-      <Link href="#">Forgot password?</Link>
+    <div class="flex items-center justify-end">
+      <a href="#forgot-password" class="underline">
+        <Text color="primary">Forgot password?</Text></a
+      >
     </div>
 
     <Button type="submit" :loading="loading">Sign In</Button>
   </form>
 </template>
+
 <script>
 import Input from "@/components/atoms/Input.vue";
+import Text from "@/components/atoms/Text.vue";
 import Button from "@/components/atoms/ButtonBase.vue";
-import Link from "@/components/atoms/Link.vue";
 import axios from "axios";
 import { notify } from "@/utils/notify.js";
 import * as yup from "yup";
@@ -34,7 +37,7 @@ import * as yup from "yup";
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 export default {
-  components: { Input, Button, Link },
+  components: { Input, Button, Text },
 
   data() {
     return {
@@ -70,8 +73,6 @@ export default {
           err.inner.forEach((e) => {
             this.errors[e.path] = e.message;
           });
-        } else if (err.path) {
-          this.errors[err.path] = err.message;
         }
         return false;
       }
@@ -82,16 +83,23 @@ export default {
       if (!isValid) return;
 
       this.loading = true;
+
       try {
-        const response = await axios.post(`${API_BASE_URL}/auth/login`, {
+        const { data } = await axios.post(`${API_BASE_URL}/auth/login`, {
           email: this.form.email,
           password: this.form.password,
         });
 
-        notify(response.data.message, "success");
-        localStorage.setItem("token", response.data.token);
+        notify(data.message, "success");
+
+        // ✅ Save token
+        localStorage.setItem("token", data.token);
+
+        // ✅ Save username
+        localStorage.setItem("username", data.user.name);
+
+        // Redirect
         this.$router.push({ name: "Workspace" });
-        
       } catch (error) {
         notify(error.response?.data?.message || "Login failed", "error");
       } finally {

@@ -29,7 +29,7 @@
       ></path>
     </svg>
 
-    <Icon class="size-5 mr-2" v-if="icon && !loading" :name="icon" />
+    <Icon class="mr-2" size="md" v-if="icon && !loading" :name="icon" />
     <slot></slot>
   </ButtonBase>
 </template>

@@ -1,10 +1,11 @@
-<!-- \src\pages\Register.vue -->
+<!-- src/pages/Register.vue -->
 <template>
-  <div class="min-h-screen flex items-center justify-center bg-gray-200">
+  <AuthTemplate>
     <RegisterCard />
-  </div>
+  </AuthTemplate>
 </template>
 
 <script setup>
+import AuthTemplate from '@/components/templates/AuthTemplate.vue'
 import RegisterCard from '@/components/organisms/RegisterCard.vue'
 </script>

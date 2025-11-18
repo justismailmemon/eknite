@@ -36,6 +36,7 @@ import { notify } from "@/utils/notify.js";
 import * as yup from "yup";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
 export default {
   components: { Input, Button },
 
@@ -71,6 +72,7 @@ export default {
         return true;
       } catch (err) {
         this.errors = {};
+
         if (err.inner) {
           err.inner.forEach((e) => {
             this.errors[e.path] = e.message;
@@ -78,6 +80,7 @@ export default {
         } else if (err.path) {
           this.errors[err.path] = err.message;
         }
+
         return false;
       }
     },
@@ -87,26 +90,33 @@ export default {
       if (!isValid) return;
 
       this.loading = true;
+
       try {
-        // 1. Register user
+        // 1. REGISTER
         await axios.post(`${API_BASE_URL}/auth/register`, this.form);
 
         notify("Registration successful!", "success");
 
-        // 2. Auto-login
+        // 2. AUTO LOGIN
         const loginResponse = await axios.post(`${API_BASE_URL}/auth/login`, {
           email: this.form.email,
           password: this.form.password,
         });
 
-        const token = loginResponse.data.token;
+        const { token, user } = loginResponse.data;
+
+        // Save token and username
         if (token) {
-          localStorage.setItem("token", token); // save token for authenticated requests
+          localStorage.setItem("token", token);
+        }
+
+        if (user?.name) {
+          localStorage.setItem("username", user.name);
         }
 
         notify("Logged in successfully!", "success");
 
-        // 3. Redirect (example using Vue Router)
+        // 3. REDIRECT
         this.$router.push("/workspace");
       } catch (error) {
         notify(
