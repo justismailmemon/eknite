@@ -1,13 +1,20 @@
 <template>
   <header
-    class="border-b-3 border-gray-300 p-4 md:px-8 flex items-center justify-between"
+    class="border-b border-gray-300 p-4 md:px-8 flex items-center justify-between"
   >
     <!-- Logo / Brand -->
-    <Text tag="h1" size="text-4xl" weight="font-semibold" color="text-primary">
-      Eknite
-    </Text>
+    <div>
+      <Text
+        tag="h1"
+        size="text-4xl"
+        weight="font-semibold"
+        color="text-primary"
+      >
+        Eknite
+      </Text>
+    </div>
 
-    <!-- Username + Logout -->
+    <!-- Username + Slot -->
     <div class="flex items-center space-x-4">
       <div class="flex items-center space-x-2">
         <img
@@ -20,33 +27,19 @@
         </Text>
       </div>
 
-      <!-- Logout Button -->
-      <Button
-        variant="danger"
-        width="w-fit"
-        customClass="px-4 py-2"
-        :loading="logoutLoading"
-        @click="handleLogout"
-      >
-        Logout
-      </Button>
+      <!-- ⭐ HERE IS THE SLOT -->
+      <slot />
     </div>
   </header>
 </template>
+
 <script setup>
 import { ref, onMounted } from "vue";
 import { useRouter } from "vue-router";
 import Text from "@/components/atoms/Text.vue";
-import Button from "../atoms/ButtonBase.vue";
 
 const router = useRouter();
 const username = ref("User");
-
-const handleLogout = () => {
-  localStorage.removeItem("token");
-  localStorage.removeItem("username");
-  router.push("/login");
-};
 
 onMounted(() => {
   const saved = localStorage.getItem("username");

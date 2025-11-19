@@ -1,5 +1,6 @@
 <template>
   <div>
+    <!-- Label -->
     <label
       v-if="label"
       :for="id"
@@ -8,21 +9,23 @@
       {{ label }}
     </label>
 
-    <input
+    <!-- Textarea -->
+    <textarea
       :id="id"
-      :type="type"
       :value="modelValue"
       @input="$emit('update:modelValue', $event.target.value)"
       :placeholder="placeholder"
+      :rows="rows"
       :class="[
-        'w-full rounded-lg border focus:outline-none transition',
+        'w-full rounded-lg border focus:outline-none transition resize-none',
         sizeClass,
         error
           ? 'border-red-500'
           : 'border-gray-300 focus:ring-primary focus:ring-2',
       ]"
-    />
+    ></textarea>
 
+    <!-- Error -->
     <p v-if="error" class="text-red-500 text-sm mt-1">{{ error }}</p>
   </div>
 </template>
@@ -31,32 +34,37 @@
 import { computed } from "vue";
 
 const props = defineProps({
-  modelValue: [String, Number],
+  modelValue: {
+    type: [String, Number],
+    default: "",
+  },
   id: String,
-  type: { type: String, default: "text" },
   placeholder: String,
   label: String,
   error: String,
 
-  // 👇 size prop instead of py/px
+  rows: {
+    type: Number,
+    default: 5,
+  },
+
   size: {
     type: String,
-    default: "md", // "sm" | "md" | "lg"
+    default: "md",
     validator: (val) => ["sm", "md", "lg"].includes(val),
   },
 });
 
 const emits = defineEmits(["update:modelValue"]);
 
-// Map size → padding + font-size
+// Shared padding tokens (same as Input + Button)
 const sizeClass = computed(() => {
   const map = {
-    sm: "px-3 py-2 text-sm",      // matched with button
-    md: "px-4 py-2.5 text-base",  // matched
-    lg: "px-5 py-3 text-lg",      // matched
+    sm: "px-3 py-2 text-sm",
+    md: "px-4 py-2.5 text-base",
+    lg: "px-5 py-3 text-lg",
   };
 
   return map[props.size];
 });
-
 </script>

@@ -1,0 +1,30 @@
+{
+    "success": true,
+    "error": false,
+    "status": 1,
+    "results": [
+        {
+            "_id": "--1",
+            "name": "--1",
+            "description": "",
+            "welcome_message": "Welcome",
+            "billing": {
+                "email": "iamibrahimmemon@gmail.com"
+            },
+            "apps": {
+                "VIDEO_CURATOR": false,
+                "AI_WRITER": true,
+                "KNOWLEDGE_BASE": true,
+                "PODCAST": true,
+                "AI_STUDIO": true,
+                "AI_ASSISTANT": true
+            },
+            "cards": [],
+            "since": "2024-10-26T08:25:21.440Z",
+            "_created_by": "fjXcRhDg5B2HIiaF",
+            "_created": "2024-10-26T08:25:21.441Z",
+            "_updated": "2024-10-26T08:25:21.441Z",
+            "__v": 0
+        }
+    ]
+}

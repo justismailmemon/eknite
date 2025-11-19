@@ -15,5 +15,40 @@ body,
 @theme {
   --color-primary: #234323;
   --color-primary-dark: #1a2a1a;
-  --color-secondary: #ffffff; /* white */
+
+  --color-secondary: #ffffff;
+  --color-secondary-dark: #e5e5e5;
+}
+
+/* BUTTON VARIANTS */
+
+.btn-primary {
+  @apply bg-primary text-secondary hover:bg-primary-dark;
+}
+
+.btn-secondary {
+  @apply bg-secondary text-primary hover:bg-secondary-dark;
+}
+
+.btn-outline {
+  @apply border border-primary text-primary hover:border-primary-dark hover:text-primary-dark;
+}
+
+.btn-danger {
+  @apply bg-red-500 text-white hover:bg-red-600;
+}
+
+/* Loading state */
+.btn-loading {
+  @apply opacity-70 cursor-not-allowed;
+}
+
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 120ms ease-out, transform 120ms ease-out;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+  transform: translateY(-2px);
 }
