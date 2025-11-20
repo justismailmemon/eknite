@@ -4,6 +4,9 @@ import Register from "@/pages/Register.vue";
 import Workspace from "@/pages/Workspace.vue";
 import Documents from "@/pages/Documents.vue";
 
+import NProgress from "nprogress";
+import "nprogress/nprogress.css";
+
 const routes = [
   { path: "/", redirect: "/workspace" },
   { path: "/login", name: "Login", component: Login },
@@ -27,9 +30,13 @@ const router = createRouter({
   routes,
 });
 
-// 🔒 Global navigation guard
+// 🔒 Auth guard + Progress Bar
 const authPages = ["/login", "/register"];
+
 router.beforeEach((to, from, next) => {
+  // Start NProgress
+  NProgress.start();
+
   const isAuthenticated = Boolean(localStorage.getItem("token"));
 
   if (to.meta.requiresAuth && !isAuthenticated) {
@@ -41,6 +48,11 @@ router.beforeEach((to, from, next) => {
   }
 
   next();
+});
+
+// Finish NProgress
+router.afterEach(() => {
+  NProgress.done();
 });
 
 export default router;

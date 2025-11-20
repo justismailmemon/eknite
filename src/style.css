@@ -52,3 +52,18 @@ body,
   opacity: 0;
   transform: translateY(-2px);
 }
+
+/* Progress bar color */
+#nprogress .bar {
+  background: #3BAE5C !important;
+}
+
+/* Glow effect */
+#nprogress .peg {
+  box-shadow: 0 0 10px #3BAE5C, 0 0 5px #3BAE5C !important;
+}
+
+/* Hide spinner */
+#nprogress .spinner {
+  display: none !important;
+}

@@ -18,94 +18,85 @@
 
     <div class="flex items-center justify-end">
       <a href="#forgot-password" class="underline">
-        <Text color="primary">Forgot password?</Text></a
-      >
+        <Text color="primary">Forgot password?</Text>
+      </a>
     </div>
 
     <Button type="submit" :loading="loading">Sign In</Button>
   </form>
 </template>
 
-<script>
+<script setup>
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+import api from "@/api/axios.js";       // ✅ use custom axios instance
 import Input from "@/components/atoms/Input.vue";
 import Text from "@/components/atoms/Text.vue";
 import Button from "@/components/atoms/ButtonBase.vue";
-import axios from "axios";
-import { notify } from "@/utils/notify.js";
 import * as yup from "yup";
+import { notify } from "@/utils/notify.js";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const router = useRouter();
 
-export default {
-  components: { Input, Button, Text },
+const form = ref({
+  email: "",
+  password: "",
+});
 
-  data() {
-    return {
-      form: {
-        email: "",
-        password: "",
-      },
-      errors: {},
-      loading: false,
-    };
-  },
+const errors = ref({});
+const loading = ref(false);
 
-  methods: {
-    async validate() {
-      const schema = yup.object().shape({
-        email: yup
-          .string()
-          .email("Enter a valid email")
-          .required("Email is required"),
-        password: yup
-          .string()
-          .min(6, "Password must be at least 6 characters")
-          .required("Password is required"),
+// Validation schema
+const schema = yup.object().shape({
+  email: yup.string().email("Enter a valid email").required("Email is required"),
+  password: yup
+    .string()
+    .min(6, "Password must be at least 6 characters")
+    .required("Password is required"),
+});
+
+// Validate input fields
+const validate = async () => {
+  try {
+    await schema.validate(form.value, { abortEarly: false });
+    errors.value = {};
+    return true;
+  } catch (err) {
+    errors.value = {};
+    if (err.inner) {
+      err.inner.forEach((e) => {
+        errors.value[e.path] = e.message;
       });
+    }
+    return false;
+  }
+};
 
-      try {
-        await schema.validate(this.form, { abortEarly: false });
-        this.errors = {};
-        return true;
-      } catch (err) {
-        this.errors = {};
-        if (err.inner) {
-          err.inner.forEach((e) => {
-            this.errors[e.path] = e.message;
-          });
-        }
-        return false;
-      }
-    },
+// Submit login form
+const handleSubmit = async () => {
+  const isValid = await validate();
+  if (!isValid) return;
 
-    async handleSubmit() {
-      const isValid = await this.validate();
-      if (!isValid) return;
+  loading.value = true;
 
-      this.loading = true;
+  try {
+    const { data } = await api.post("/auth/login", {
+      email: form.value.email,
+      password: form.value.password,
+    });
 
-      try {
-        const { data } = await axios.post(`${API_BASE_URL}/auth/login`, {
-          email: this.form.email,
-          password: this.form.password,
-        });
+    notify(data.message || "Logged in successfully", "success");
 
-        notify(data.message, "success");
+    // Save token & username
+    localStorage.setItem("token", data.token);
+    localStorage.setItem("username", data.user.name);
 
-        // ✅ Save token
-        localStorage.setItem("token", data.token);
-
-        // ✅ Save username
-        localStorage.setItem("username", data.user.name);
-
-        // Redirect
-        this.$router.push({ name: "Workspace" });
-      } catch (error) {
-        notify(error.response?.data?.message || "Login failed", "error");
-      } finally {
-        this.loading = false;
-      }
-    },
-  },
+    // Redirect
+    router.push({ name: "Workspace" });
+  } catch (error) {
+    notify(error.response?.data?.message || "Login failed", "error");
+  } finally {
+    loading.value = false;
+  }
 };
 </script>

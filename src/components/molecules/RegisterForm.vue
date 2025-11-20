@@ -28,105 +28,91 @@
   </form>
 </template>
 
-<script>
+<script setup>
+import { ref } from "vue";
+import { useRouter } from "vue-router";
+import api from "@/api/axios.js";          // ✅ now using custom axios
 import Input from "@/components/atoms/Input.vue";
 import Button from "@/components/atoms/ButtonBase.vue";
-import axios from "axios";
-import { notify } from "@/utils/notify.js";
 import * as yup from "yup";
+import { notify } from "@/utils/notify.js";
 
-const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const router = useRouter();
 
-export default {
-  components: { Input, Button },
+// Form state
+const form = ref({
+  name: "",
+  email: "",
+  password: "",
+});
 
-  data() {
-    return {
-      form: {
-        name: "",
-        email: "",
-        password: "",
-      },
-      errors: {},
-      loading: false,
-    };
-  },
+const errors = ref({});
+const loading = ref(false);
 
-  methods: {
-    async validate() {
-      const schema = yup.object().shape({
-        name: yup.string().required("Name is required"),
-        email: yup
-          .string()
-          .email("Enter a valid email")
-          .required("Email is required"),
-        password: yup
-          .string()
-          .min(6, "Password must be at least 6 characters")
-          .required("Password is required"),
-      });
+// Validation schema
+const schema = yup.object().shape({
+  name: yup.string().required("Name is required"),
+  email: yup
+    .string()
+    .email("Enter a valid email")
+    .required("Email is required"),
+  password: yup
+    .string()
+    .min(6, "Password must be at least 6 characters")
+    .required("Password is required"),
+});
 
-      try {
-        await schema.validate(this.form, { abortEarly: false });
-        this.errors = {};
-        return true;
-      } catch (err) {
-        this.errors = {};
+// Validate input
+const validate = async () => {
+  try {
+    await schema.validate(form.value, { abortEarly: false });
+    errors.value = {};
+    return true;
+  } catch (err) {
+    errors.value = {};
+    err.inner?.forEach((e) => {
+      errors.value[e.path] = e.message;
+    });
+    return false;
+  }
+};
 
-        if (err.inner) {
-          err.inner.forEach((e) => {
-            this.errors[e.path] = e.message;
-          });
-        } else if (err.path) {
-          this.errors[err.path] = err.message;
-        }
+// Handle submit
+const handleSubmit = async () => {
+  const isValid = await validate();
+  if (!isValid) return;
 
-        return false;
-      }
-    },
+  loading.value = true;
 
-    async handleSubmit() {
-      const isValid = await this.validate();
-      if (!isValid) return;
+  try {
+    // 1. REGISTER
+    await api.post("/auth/register", form.value);
 
-      this.loading = true;
+    notify("Registration successful!", "success");
 
-      try {
-        // 1. REGISTER
-        await axios.post(`${API_BASE_URL}/auth/register`, this.form);
+    // 2. AUTO LOGIN
+    const loginResponse = await api.post("/auth/login", {
+      email: form.value.email,
+      password: form.value.password,
+    });
 
-        notify("Registration successful!", "success");
+    const { token, user } = loginResponse.data;
 
-        // 2. AUTO LOGIN
-        const loginResponse = await axios.post(`${API_BASE_URL}/auth/login`, {
-          email: this.form.email,
-          password: this.form.password,
-        });
+    // Save token & username
+    if (token) localStorage.setItem("token", token);
+    if (user?.name) localStorage.setItem("username", user.name);
 
-        const { token, user } = loginResponse.data;
+    notify("Logged in successfully!", "success");
 
-        // Save token and username
-        if (token) {
-          localStorage.setItem("token", token);
-        }
-
-        if (user?.name) {
-          localStorage.setItem("username", user.name);
-        }
-
-        notify("Logged in successfully!", "success");
-
-        // 3. REDIRECT
-        this.$router.push("/workspace");
-      } catch (error) {
-        notify(
-          error.response?.data?.message || "Something went wrong",
-          "error"
-        );
-      } finally {
-        this.loading = false;
-      }
-    },
-  },
+    // 3. Redirect
+    router.push("/workspace");
+  } catch (error) {
+    notify(
+      error.response?.data?.message || "Something went wrong",
+      "error"
+    );
+  } finally {
+    loading.value = false;
+  }
 };
 </script>

@@ -1,35 +1,48 @@
 <template>
   <component
-    v-if="iconComponent"
     :is="iconComponent"
-    :class="`${sizeClasses} ${customClass}`"
+    :size="px || undefined"
+    :stroke-width="strokeWidthNum"
+    :class="['icon', sizeClass]"
   />
-  <span v-else class="text-red-500 text-xs">Icon not found</span>
 </template>
 
 <script setup>
-import * as TablerIcons from "@tabler/icons-vue";
 import { computed } from "vue";
+import * as icons from "lucide-vue-next";
 
 const props = defineProps({
   name: { type: String, required: true },
 
-  // Small, medium, large sizes — customizable
-  size: { type: String, default: "md" },
+  // "sm" | "md" | "lg" | numeric ("7" or 7) | Tailwind ("size-8" / "w-6 h-6")
+  size: { type: [String, Number], default: "md" },
 
-  customClass: { type: String, default: "" },
+  // Optional exact pixels (overrides class sizing in Lucide)
+  px: { type: [Number, String], default: null },
+
+  // NEW: stroke width for the icon outline
+  strokeWidth: { type: [Number, String], default: 2 },
 });
 
-const sizeMap = {
-  xs: "size-3",
-  sm: "size-4",
-  md: "size-5",
-  lg: "size-6",
-  xl: "size-7",
-  xxl: "size-8",
-};
+const iconComponent = computed(() => icons[props.name] || icons.CircleHelp);
 
-const sizeClasses = computed(() => sizeMap[props.size] || sizeMap["md"]);
+// class-based sizing
+const sizeClass = computed(() => {
+  const map = { sm: "size-4", md: "size-5", lg: "size-6" };
+  const raw = String(props.size).trim();
 
-const iconComponent = computed(() => TablerIcons[props.name] || null);
+  if (/^(size-\d+|w-\d+\s*h-\d+|w-\[\d+px\]\s*h-\[\d+px\])$/.test(raw)) return raw;
+  if (/^\d+$/.test(raw)) return `w-${raw} h-${raw}`;
+  return map[raw] || map.md;
+});
+
+// normalize strokeWidth to a number
+const strokeWidthNum = computed(() => {
+  const n = Number(props.strokeWidth);
+  return Number.isFinite(n) ? n : 2;
+});
 </script>
+
+<style scoped>
+.icon { /* keep empty or add shared classes; avoid forcing stroke-width here */ }
+</style>

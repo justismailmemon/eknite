@@ -4,7 +4,7 @@
       v-for="(item, index) in workspaces"
       :key="index"
       :name="item.name"
-      @click="openWorkspace(item.id)"
+      @click="openWorkspace(item._id)"
     />
   </div>
 </template>
