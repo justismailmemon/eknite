@@ -2,7 +2,6 @@
   <div
     class="bg-primary w-full rounded-lg flex items-center justify-between gap-6 px-6 py-6"
   >
-    <!-- LEFT: PROPS TEXT -->
     <div>
       <Text
         v-if="title"
@@ -19,7 +18,6 @@
       </Text>
     </div>
 
-    <!-- RIGHT: SLOT -->
     <div>
       <slot />
     </div>

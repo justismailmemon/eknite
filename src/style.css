@@ -13,8 +13,8 @@ body,
 }
 
 @theme {
-  --color-primary: #234323;
-  --color-primary-dark: #1a2a1a;
+  --color-primary: #b08f6c;
+  --color-primary-dark: #8f7354;
 
   --color-secondary: #ffffff;
   --color-secondary-dark: #e5e5e5;
@@ -22,26 +22,8 @@ body,
 
 /* BUTTON VARIANTS */
 
-.btn-primary {
-  @apply bg-primary text-secondary hover:bg-primary-dark;
-}
+/* your fade + nprogress code can stay as-is */
 
-.btn-secondary {
-  @apply bg-secondary text-primary hover:bg-secondary-dark;
-}
-
-.btn-outline {
-  @apply border border-primary text-primary hover:border-primary-dark hover:text-primary-dark;
-}
-
-.btn-danger {
-  @apply bg-red-500 text-white hover:bg-red-600;
-}
-
-/* Loading state */
-.btn-loading {
-  @apply opacity-70 cursor-not-allowed;
-}
 
 .fade-enter-active,
 .fade-leave-active {
@@ -55,12 +37,14 @@ body,
 
 /* Progress bar color */
 #nprogress .bar {
-  background: #3BAE5C !important;
+  background: var(--color-primary) !important;
 }
 
 /* Glow effect */
 #nprogress .peg {
-  box-shadow: 0 0 10px #3BAE5C, 0 0 5px #3BAE5C !important;
+  box-shadow: 
+    0 0 10px var(--color-primary), 
+    0 0 5px var(--color-primary) !important;
 }
 
 /* Hide spinner */

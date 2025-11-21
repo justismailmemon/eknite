@@ -1,8 +1,6 @@
 <template>
-  <!-- FULL-SCREEN CREATE (no layout) -->
-  <CreateWorkspace v-if="route.query.id === 'create-new'" />
+  <CreateWorkspace v-if="route.query.id === 'create-new-workspace'" />
 
-  <!-- NORMAL LIST (with layout) -->
   <BaseLayoutTemplate v-else :adminItems="adminItems" @logout="$emit('logout')">
     <div class="space-y-6">
       <Hero
@@ -15,7 +13,6 @@
           </Button>
         </div>
       </Hero>
-
       <WorkspaceGrid :workspaces="workspaces" />
     </div>
   </BaseLayoutTemplate>
@@ -39,6 +36,6 @@ const router = useRouter();
 const route = useRoute();
 
 const goToCreateWorkspace = () => {
-  router.push({ name: "Workspace", query: { id: "create-new" } });
+  router.push({ name: "Workspace", query: { id: "create-new-workspace" } });
 };
 </script>

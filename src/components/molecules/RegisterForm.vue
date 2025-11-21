@@ -31,7 +31,7 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import api from "@/api/axios.js";          // ✅ now using custom axios
+import api from "@/api/axios.js";
 import Input from "@/components/atoms/Input.vue";
 import Button from "@/components/atoms/ButtonBase.vue";
 import * as yup from "yup";

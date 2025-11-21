@@ -17,8 +17,8 @@
     />
 
     <div class="flex items-center justify-end">
-      <a href="#forgot-password" class="underline">
-        <Text color="primary">Forgot password?</Text>
+      <a href="#forgot-password">
+        <Text color="text-primary" underline>Forgot password?</Text>
       </a>
     </div>
 
@@ -29,7 +29,7 @@
 <script setup>
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import api from "@/api/axios.js";       // ✅ use custom axios instance
+import api from "@/api/axios.js"; 
 import Input from "@/components/atoms/Input.vue";
 import Text from "@/components/atoms/Text.vue";
 import Button from "@/components/atoms/ButtonBase.vue";

@@ -1,6 +1,5 @@
 <template>
   <div class="h-screen flex flex-col bg-white">
-    <!-- HEADER BAR -->
     <div
       class="w-full px-6 py-2 border-b flex items-center justify-between bg-white sticky top-0 z-10"
     >
@@ -14,10 +13,8 @@
       </Button>
     </div>
 
-    <!-- BODY -->
     <div class="flex-1 overflow-y-auto px-6 py-4 mx-auto w-full">
       <div class="space-y-6">
-        <!-- Name Field -->
         <Input
           v-model="form.name"
           label="Name"

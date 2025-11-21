@@ -1,10 +1,13 @@
 <template>
   <div class="relative">
-    <div class="overflow-visible rounded-2xl border border-slate-200 bg-white shadow-sm">
+    <div
+      class="overflow-visible rounded-2xl border border-slate-200 bg-white shadow-sm"
+    >
       <table class="min-w-full text-sm">
-
         <!-- HEADER -->
-        <thead class="bg-slate-50 !rounded-t-2xl text-left text-xs font-semibold uppercase tracking-wide text-slate-500">
+        <thead
+          class="bg-slate-50 !rounded-t-2xl text-left text-xs font-semibold uppercase tracking-wide text-slate-500"
+        >
           <tr>
             <th class="w-10 px-4 py-3">
               <input
@@ -28,10 +31,12 @@
         <tbody class="divide-y divide-slate-100 text-sm text-slate-700">
           <tr
             v-for="row in rows"
-            :key="row.id"
+            :key="row._id"
             :class="[
-              'transition-colors',
-              selectedRows.includes(row.id) ? 'bg-indigo-50' : 'hover:bg-slate-50',
+              'transition-colors cursor-pointer',
+              selectedRows.includes(row._id)
+                ? 'bg-indigo-50'
+                : 'hover:bg-slate-50',
             ]"
           >
             <!-- CHECKBOX -->
@@ -39,53 +44,82 @@
               <input
                 type="checkbox"
                 class="h-4 w-4"
-                :value="row.id"
-                :checked="selectedRows.includes(row.id)"
-                @change="toggleRow(row.id)"
+                :value="row._id"
+                :checked="selectedRows.includes(row._id)"
+                @change="toggleRow(row._id)"
               />
             </td>
 
             <!-- NAME -->
             <td class="max-w-xs truncate px-4 py-3 font-medium">
-              {{ row.name }}
+              {{ row.title || "-" }}
             </td>
 
             <!-- OWNER -->
-            <td class="px-4 py-3">{{ row.owner }}</td>
+            <td class="px-4 py-3">{{ row.owner || "-" }}</td>
 
             <!-- FOLDERS -->
-            <td class="px-4 py-3">{{ row.folders }}</td>
+            <td class="px-4 py-3">{{ row.folders || "-" }}</td>
 
             <!-- DOCUMENTS -->
-            <td class="px-4 py-3">{{ row.docs }}</td>
+            <td class="px-4 py-3">{{ row.documents || "-" }}</td>
 
             <!-- ORDER -->
-            <td class="px-4 py-3">{{ row.order }}</td>
+            <td class="px-4 py-3">{{ row.order || "-" }}</td>
 
             <!-- LAST MODIFIED -->
-            <td class="px-4 py-3 text-slate-500">{{ row.modified }}</td>
+            <td class="px-4 py-3 text-slate-500">
+              {{ formatDate(row._updated) }}
+            </td>
 
             <!-- ACTIONS -->
             <td class="relative px-4 py-3 text-center">
-              <button
-                type="button"
-                class="menu-btn inline-flex h-8 w-8 justify-center items-center rounded-full hover:bg-slate-100"
-                @click="toggleMenu(row.id)"
+              <Button
+                variant="icon"
+                class="menu-btn"
+                @click="toggleMenu(row._id)"
               >
                 ⋮
-              </button>
+              </Button>
 
               <!-- DROPDOWN -->
               <transition name="fade">
                 <div
-                  v-if="openMenu === row.id"
+                  v-if="openMenu === row._id"
                   class="dropdown-menu absolute right-2 top-9 z-50 w-36 rounded-lg border border-slate-200 bg-white shadow-lg"
+                  @click.stop
                 >
-                  <button class="block w-full px-3 py-2 text-left hover:bg-slate-50">Edit</button>
-                  <button class="block w-full px-3 py-2 text-left hover:bg-slate-50">Move</button>
-                  <button class="block w-full px-3 py-2 text-left hover:bg-slate-50">Copy</button>
-                  <button class="block w-full px-3 py-2 text-left hover:bg-slate-50">Share</button>
-                  <button class="block w-full px-3 py-2 text-left text-red-600 hover:bg-red-50">Delete</button>
+                  <button
+                    class="block cursor-pointer w-full px-3 py-2 text-left hover:bg-slate-50"
+                    @click.stop="goToEditDocument(row._id)"
+                  >
+                    Edit
+                  </button>
+
+                  <button
+                    class="block cursor-pointer w-full px-3 py-2 text-left hover:bg-slate-50"
+                  >
+                    Move
+                  </button>
+
+                  <button
+                    class="block cursor-pointer w-full px-3 py-2 text-left hover:bg-slate-50"
+                  >
+                    Copy
+                  </button>
+
+                  <button
+                    class="block cursor-pointer w-full px-3 py-2 text-left hover:bg-slate-50"
+                  >
+                    Share
+                  </button>
+
+                  <button
+                    class="block cursor-pointer w-full px-3 py-2 text-left text-red-600 hover:bg-red-50"
+                    @click.stop="deleteDoc(row._id)"
+                  >
+                    Delete
+                  </button>
                 </div>
               </transition>
             </td>
@@ -104,16 +138,37 @@
 
 <script setup>
 import { ref, computed, onMounted, onBeforeUnmount } from "vue";
+import { useRoute, useRouter } from "vue-router";
+import Button from "@/components/atoms/ButtonBase.vue";
+import api from "@/api/axios.js";
+import { notify } from "@/utils/notify.js";
 
 const props = defineProps({
   rows: Array,
   selectedRows: Array,
 });
 
-const emit = defineEmits(["update:selectedRows"]);
+// ❗ FIX: declare deleted event
+const emit = defineEmits(["update:selectedRows", "deleted"]);
+
+const route = useRoute();
+const router = useRouter();
+
 const openMenu = ref(null);
 
-// CLICK OUTSIDE CLOSE
+const formatDate = (date) => {
+  if (!date) return "-";
+  return new Date(date).toLocaleString("en-US", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
+    hour12: true,
+  });
+};
+
+// CLICK OUTSIDE
 const handleClickOutside = (event) => {
   if (
     !event.target.closest(".dropdown-menu") &&
@@ -122,18 +177,22 @@ const handleClickOutside = (event) => {
     openMenu.value = null;
   }
 };
-onMounted(() => document.addEventListener("click", handleClickOutside));
-onBeforeUnmount(() => document.removeEventListener("click", handleClickOutside));
 
-// SELECT LOGIC
+onMounted(() => document.addEventListener("click", handleClickOutside));
+onBeforeUnmount(() =>
+  document.removeEventListener("click", handleClickOutside)
+);
+
+// CHECKBOXES
 const isAllChecked = computed(
   () => props.rows.length > 0 && props.selectedRows.length === props.rows.length
 );
 
 const toggleAll = (e) => {
-  const checked = e.target.checked;
-  const newList = checked ? props.rows.map((r) => r.id) : [];
-  emit("update:selectedRows", newList);
+  emit(
+    "update:selectedRows",
+    e.target.checked ? props.rows.map((r) => r._id) : []
+  );
 };
 
 const toggleRow = (id) => {
@@ -145,19 +204,31 @@ const toggleRow = (id) => {
   }
 };
 
-// DROPDOWN
+// MENU
 const toggleMenu = (id) => {
   openMenu.value = openMenu.value === id ? null : id;
 };
+
+// EDIT NAVIGATION
+const goToEditDocument = (id) => {
+  router.push(`/workspace/${route.params.id}/documents?id=${id}`);
+};
+
+// DELETE
+const deleteDoc = async (docId) => {
+  try {
+    const wsId = route.params.id;
+
+    const res = await api.delete(`/workspace/${wsId}/documents/${docId}`);
+
+    notify(res.data?.message || "Document deleted", "success");
+
+    emit("deleted", docId);
+
+    openMenu.value = null;
+  } catch (error) {
+    notify(error?.response?.data?.message || "Delete failed", "error");
+  }
+};
 </script>
 
-<style scoped>
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 120ms ease-out;
-}
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
-}
-</style>

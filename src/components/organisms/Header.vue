@@ -1,7 +1,6 @@
 <template>
-  <header
-    class="border-b border-gray-300 w-full h-16 bg-white p-4 md:px-8 flex items-center justify-between"
-  >
+  <header class="h-[85px] border-b border-gray-300 w-full bg-white p-4 md:px-8 flex items-center justify-between">
+
     <!-- Logo / Brand -->
     <div>
       <Text

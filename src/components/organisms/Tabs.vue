@@ -19,9 +19,9 @@
         </button>
       </div>
 
-      <!-- RIGHT SIDE -->
+      <!-- RIGHT: SEARCH + SORT + ACTION BAR -->
       <div class="flex items-center gap-3">
-        <!-- ACTION BAR -->
+        <!-- ACTION BAR (selected rows) -->
         <transition name="fade">
           <div
             v-if="selectedRows.length > 0"
@@ -31,13 +31,8 @@
               {{ selectedRows.length }} selected
             </span>
 
-            <ButtonBase variant="outline" size="sm" @click="moveSelected">
-              Move
-            </ButtonBase>
-
-            <ButtonBase variant="outline" size="sm" @click="copySelected">
-              Copy
-            </ButtonBase>
+            <ButtonBase variant="outline" size="sm">Move</ButtonBase>
+            <ButtonBase variant="outline" size="sm">Copy</ButtonBase>
 
             <ButtonBase
               variant="outline"
@@ -50,17 +45,30 @@
           </div>
         </transition>
 
+        <!-- SORT (using Select) -->
+        <Select
+          v-model="sort"
+          size="sm"
+          :options="sortOptions"
+          @update:modelValue="emitFilters"
+        />
+
         <!-- SEARCH -->
-        <Input placeholder="Search..." size="sm" />
-        <!-- ACTION BAR -->
+        <Input
+          placeholder="Search..."
+          size="sm"
+          v-model="searchText"
+          @input="emitFilters"
+        />
       </div>
     </div>
 
-    <!-- TABLE -->
+    <!-- TABLES -->
     <Table
       v-if="activeTab === 'recent'"
-      :rows="recentRows"
+      :rows="localDocuments"
       v-model:selectedRows="selectedRows"
+      @deleted="removeDocument"
     />
 
     <Table
@@ -78,53 +86,65 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { ref, watch } from "vue";
 import Table from "@/components/molecules/Table.vue";
 import ButtonBase from "@/components/atoms/ButtonBase.vue";
-import Input from "../atoms/Input.vue";
+import Input from "@/components/atoms/Input.vue";
+import Select from "@/components/atoms/Select.vue";
 
+// PROPS
+const props = defineProps({
+  documents: Array,
+});
+
+// EMITS
+const emit = defineEmits(["filters", "delete-selected"]);
+
+// LOCAL COPY (no prop mutation)
+const localDocuments = ref([...props.documents]);
+
+watch(
+  () => props.documents,
+  (val) => (localDocuments.value = [...val])
+);
+
+// UI STATE
+const activeTab = ref("recent");
+const selectedRows = ref([]);
+const searchText = ref("");
+const sort = ref("last_modified");
+
+// SORT OPTIONS (for Select)
+const sortOptions = [
+  { label: "Last Modified", value: "last_modified" },
+  { label: "Name A–Z", value: "title_asc" },
+  { label: "Name Z–A", value: "title_desc" },
+  { label: "Newest Created", value: "created_desc" },
+  { label: "Oldest Created", value: "created_asc" },
+];
+
+// TABS
 const tabs = [
   { key: "recent", label: "Recent Docs" },
   { key: "folders", label: "Folders" },
   { key: "shared", label: "Shared" },
 ];
 
-const activeTab = ref("recent");
-const search = ref("");
-const selectedRows = ref([]);
+// EMIT FILTER INPUT
+const emitFilters = () => {
+  emit("filters", {
+    searchText: searchText.value,
+    sort: sort.value,
+  });
+};
 
-const recentRows = [
-  {
-    id: 1,
-    name: "Project Plan",
-    owner: "Ali",
-    folders: 2,
-    docs: 4,
-    order: 1,
-    modified: "2 days ago",
-  },
-  {
-    id: 2,
-    name: "Report",
-    owner: "Sara",
-    folders: 1,
-    docs: 1,
-    order: 2,
-    modified: "1 week ago",
-  },
-  {
-    id: 3,
-    name: "Invoices",
-    owner: "John",
-    folders: 4,
-    docs: 15,
-    order: 3,
-    modified: "3 days ago",
-  },
-];
+// Remove document from local
+const removeDocument = (id) => {
+  localDocuments.value = localDocuments.value.filter((d) => d._id !== id);
+};
 
-// ACTION BAR EVENTS
-const moveSelected = () => console.log("Move:", selectedRows.value);
-const copySelected = () => console.log("Copy:", selectedRows.value);
-const deleteSelected = () => console.log("Delete:", selectedRows.value);
+// Delete selected button
+const deleteSelected = () => {
+  emit("delete-selected", selectedRows.value);
+};
 </script>

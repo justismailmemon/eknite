@@ -8,8 +8,8 @@
 
   <div class="flex items-center justify-center space-x-2">
       <Text>Already have an account? </Text>
-      <a href="/login" class="underline">
-        <Text color="text-primary" weight="font-semibold">Sign In</Text>
+      <a href="/login">
+        <Text color="text-primary" weight="font-semibold" underline>Sign In</Text>
       </a>
     </div>
    

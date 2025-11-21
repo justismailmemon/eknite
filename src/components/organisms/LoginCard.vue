@@ -8,8 +8,8 @@
 
     <div class="flex items-center justify-center space-x-2">
       <Text> Don't have an account? </Text>
-      <a href="/register" class="underline">
-        <Text color="text-primary" weight="font-semibold">Sign Up</Text>
+      <a href="/register">
+        <Text color="text-primary" underline weight="font-semibold">Sign Up</Text>
       </a>
     </div>
   </div>
@@ -19,3 +19,4 @@
 import Text from "@/components/atoms/Text.vue";
 import LoginForm from "@/components/molecules/LoginForm.vue";
 </script>
+ 
