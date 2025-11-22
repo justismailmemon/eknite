@@ -1,51 +1,54 @@
 <template>
-  <BaseLayoutTemplate :adminItems="adminItems" @logout="$emit('logout')">
+  <div>
+    <!-- CREATE -->
+    <CreateDocument
+      type="create"
+      v-if="route.query.id === 'create-new-document'"
+      @refresh="refreshData"
+    />
 
-    <!-- HEADER RIGHT: SELECT WORKSPACE -->
-    <template #header-right>
-      <SelectBox
-        :items="headerItems"
-        :loading="loading"
-        v-model="selectedItem"
-        @update:modelValue="handleSelect"
-      />
-    </template>
+    <!-- EDIT -->
+    <CreateDocument
+      type="edit"
+      v-else-if="route.query.id && route.query.id !== 'create-new-document'"
+      :documentId="route.query.id"
+      @refresh="refreshData"
+    />
 
-  <CreateDocument
-  type="create"
-  v-if="route.query.id === 'create-new-document'"
-  @refresh="refreshData"
-/>
+    <!-- LIST / MAIN -->
+    <BaseLayoutTemplate v-else :adminItems="adminItems" @logout="$emit('logout')">
+      <!-- HEADER RIGHT: SELECT WORKSPACE -->
+      <template #header-right>
+        <SelectBox
+          :items="headerItems"
+          :loading="loading"
+          v-model="selectedItem"
+          @update:modelValue="handleSelect"
+        />
+      </template>
 
-<CreateDocument
-  type="edit"
-  v-else-if="route.query.id && route.query.id !== 'create-new-document'"
-  :documentId="route.query.id"
-  @refresh="refreshData"
-/>
+      <!-- MAIN TABS -->
+      <div class="space-y-6">
+        <Hero
+          title="Welcome to AI Studio!"
+          subtitle="AI Studio empowers you to create and enhance your content using cutting-edge AI technology."
+        >
+          <div>
+            <Button variant="secondary" size="md" @click="goToCreateDocument">
+              New Document
+            </Button>
+          </div>
+        </Hero>
 
-
-    <!-- MAIN TABS -->
-    <div v-else class="space-y-6">
-      <Hero
-        title="Welcome to AI Studio!"
-        subtitle="AI Studio empowers you to create and enhance your content using cutting-edge AI technology."
-      >
-        <div>
-          <Button variant="secondary" size="md" @click="goToCreateDocument">
-            New Document
-          </Button>
-        </div>
-      </Hero>
-
-      <Tabs
-        :documents="documents"
-        @filters="emitFilters"
-        @deleted="emitDelete"
-      />
-    </div>
-
-  </BaseLayoutTemplate>
+        <Tabs
+          :documents="documents"
+          @filters="emitFilters"
+          @deleted="emitDelete"
+          @delete-selected="emitBulkDelete"
+        />
+      </div>
+    </BaseLayoutTemplate>
+  </div>
 </template>
 
 <script setup>
@@ -67,7 +70,7 @@ const props = defineProps({
   loading: Boolean,
 });
 
-const emit = defineEmits(["logout", "filters", "deleted"]);
+const emit = defineEmits(["logout", "filters", "deleted", "delete-selected"]);
 
 const route = useRoute();
 const router = useRouter();
@@ -115,4 +118,5 @@ const refreshData = () => {
 // BUBBLE EVENTS UP
 const emitFilters = (f) => emit("filters", f);
 const emitDelete = (id) => emit("deleted", id);
+const emitBulkDelete = (ids) => emit("delete-selected", ids);
 </script>

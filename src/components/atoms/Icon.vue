@@ -14,13 +14,12 @@ import * as icons from "lucide-vue-next";
 const props = defineProps({
   name: { type: String, required: true },
 
-  // "sm" | "md" | "lg" | numeric ("7" or 7) | Tailwind ("size-8" / "w-6 h-6")
+  // "sm" | "md" | "lg" | numeric | Tailwind ("size-8", "w-6 h-6")
   size: { type: [String, Number], default: "md" },
 
-  // Optional exact pixels (overrides class sizing in Lucide)
+  // optional exact px (overrides lucide size)
   px: { type: [Number, String], default: null },
 
-  // NEW: stroke width for the icon outline
   strokeWidth: { type: [Number, String], default: 2 },
 });
 
@@ -36,7 +35,7 @@ const sizeClass = computed(() => {
   return map[raw] || map.md;
 });
 
-// normalize strokeWidth to a number
+// normalize strokeWidth
 const strokeWidthNum = computed(() => {
   const n = Number(props.strokeWidth);
   return Number.isFinite(n) ? n : 2;
@@ -44,5 +43,7 @@ const strokeWidthNum = computed(() => {
 </script>
 
 <style scoped>
-.icon { /* keep empty or add shared classes; avoid forcing stroke-width here */ }
+.icon {
+  /* shared icon styles if needed */
+}
 </style>

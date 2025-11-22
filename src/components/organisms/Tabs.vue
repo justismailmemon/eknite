@@ -45,7 +45,7 @@
           </div>
         </transition>
 
-        <!-- SORT (using Select) -->
+        <!-- SORT -->
         <Select
           v-model="sort"
           size="sm"
@@ -94,7 +94,10 @@ import Select from "@/components/atoms/Select.vue";
 
 // PROPS
 const props = defineProps({
-  documents: Array,
+  documents: {
+    type: Array,
+    required: true,
+  },
 });
 
 // EMITS
@@ -105,7 +108,14 @@ const localDocuments = ref([...props.documents]);
 
 watch(
   () => props.documents,
-  (val) => (localDocuments.value = [...val])
+  (val) => {
+    localDocuments.value = [...val];
+
+    // Clean selection: keep only IDs that still exist
+    selectedRows.value = selectedRows.value.filter((id) =>
+      val.some((d) => d._id === id)
+    );
+  }
 );
 
 // UI STATE
@@ -138,13 +148,16 @@ const emitFilters = () => {
   });
 };
 
-// Remove document from local
+// Remove ONE document from local (single-row delete)
 const removeDocument = (id) => {
   localDocuments.value = localDocuments.value.filter((d) => d._id !== id);
+  selectedRows.value = selectedRows.value.filter((x) => x !== id);
 };
 
-// Delete selected button
+// Delete selected (top bar)
 const deleteSelected = () => {
-  emit("delete-selected", selectedRows.value);
+  // send a copy so parent can safely use it
+  emit("delete-selected", [...selectedRows.value]);
+  // don't clear here; parent will remove docs, watcher will clean IDs
 };
 </script>
