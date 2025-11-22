@@ -14,9 +14,11 @@
         <!-- BUBBLE -->
         <div
           class="px-3 py-2 text-sm rounded-2xl shadow-xs"
-          :class="msg.sender === 'user'
-            ? 'bg-primary text-white rounded-br-md'
-            : 'bg-white text-slate-800 border border-slate-200 rounded-bl-md'"
+          :class="
+            msg.sender === 'user'
+              ? 'bg-primary text-white rounded-br-md'
+              : 'bg-white text-slate-800 border border-slate-200 rounded-bl-md'
+          "
         >
           <Text size="text-sm" class="leading-relaxed whitespace-pre-wrap">
             {{ msg.text }}
@@ -72,6 +74,7 @@
 
           <!-- NEW BOT OPTIONS -->
           <button
+            type="button"
             class="px-2 py-[2px] rounded-full bg-slate-50 border border-slate-300 text-slate-600
                    hover:bg-slate-100 hover:border-slate-400 hover:text-slate-800 transition"
             @click="$emit('insert', msg)"
@@ -80,6 +83,7 @@
           </button>
 
           <button
+            type="button"
             class="px-2 py-[2px] rounded-full bg-slate-50 border border-slate-300 text-slate-600
                    hover:bg-slate-100 hover:border-slate-400 hover:text-slate-800 transition"
             @click="$emit('prepend', msg)"
@@ -88,6 +92,7 @@
           </button>
 
           <button
+            type="button"
             class="px-2 py-[2px] rounded-full bg-slate-50 border border-slate-300 text-slate-600
                    hover:bg-slate-100 hover:border-slate-400 hover:text-slate-800 transition"
             @click="$emit('append', msg)"
@@ -96,6 +101,7 @@
           </button>
 
           <button
+            type="button"
             class="px-2 py-[2px] rounded-full bg-slate-50 border border-slate-300 text-slate-600
                    hover:bg-slate-100 hover:border-slate-400 hover:text-slate-800 transition"
             @click="$emit('overwrite', msg)"
@@ -112,9 +118,17 @@
         class="inline-flex items-center gap-2 px-3 py-2 rounded-2xl bg-white border border-slate-200 text-xs text-slate-500"
       >
         <span class="inline-flex gap-1">
-          <span class="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce"></span>
-          <span class="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce" style="animation-delay: 0.1s"></span>
-          <span class="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce" style="animation-delay: 0.2s"></span>
+          <span
+            class="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce"
+          ></span>
+          <span
+            class="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce"
+            style="animation-delay: 0.1s"
+          ></span>
+          <span
+            class="w-1.5 h-1.5 rounded-full bg-slate-400 animate-bounce"
+            style="animation-delay: 0.2s"
+          ></span>
         </span>
         Eknite is thinking…
       </div>
@@ -123,21 +137,37 @@
 </template>
 
 <script setup>
-import { ref, nextTick } from 'vue';
+import { ref, nextTick } from "vue";
 import Text from "@/components/atoms/Text.vue";
 
 defineProps({
-  messages: Array,
-  isBotTyping: Boolean
+  messages: {
+    type: Array,
+    default: () => [],
+  },
+  isBotTyping: {
+    type: Boolean,
+    default: false,
+  },
 });
 
-defineEmits(["edit", "delete", "copy", "insert", "prepend", "append", "overwrite"]);
+defineEmits([
+  "edit",
+  "delete",
+  "copy",
+  "insert",
+  "prepend",
+  "append",
+  "overwrite",
+]);
 
 const container = ref(null);
 
 const scrollToBottom = async () => {
   await nextTick();
-  if (container.value) container.value.scrollTop = container.value.scrollHeight;
+  if (container.value) {
+    container.value.scrollTop = container.value.scrollHeight;
+  }
 };
 
 defineExpose({ scrollToBottom });

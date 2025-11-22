@@ -20,7 +20,7 @@
       <div class="flex items-center gap-3">
         <!-- VIEW MODE TOGGLES -->
         <div class="hidden md:flex items-center gap-1.5">
-          <!-- PREVIEW ONLY (right 100%) -->
+          <!-- PREVIEW ONLY -->
           <button
             type="button"
             class="p-1.5 rounded-md border text-gray-500 hover:text-primary hover:border-primary transition flex items-center justify-center"
@@ -34,8 +34,7 @@
             <Icon name="PanelRight" size="size-5" strokeWidth="1.5" />
           </button>
 
-          <!-- SPLIT (50/50) -->
-          <!-- SPLIT (50/50) -->
+          <!-- SPLIT -->
           <button
             type="button"
             class="p-1.5 rounded-md border text-gray-500 hover:text-primary hover:border-primary transition flex items-center justify-center"
@@ -49,7 +48,7 @@
             <Icon name="PanelsLeftRight" size="size-5" strokeWidth="1.5" />
           </button>
 
-          <!-- EDIT ONLY (left 100%) -->
+          <!-- EDIT ONLY -->
           <button
             type="button"
             class="p-1.5 rounded-md border text-gray-500 hover:text-primary hover:border-primary transition flex items-center justify-center"
@@ -123,8 +122,10 @@
         <div class="w-full md:w-auto md:h-full" :style="rightStyle">
           <ChatBot
             :workspace-id="workspaceIdComputed"
-            :document-id="isEdit ? documentId : null"
-            :chat-id="chatId"
+            :document-id="isEdit ? props.documentId : null"
+            :chat-id="props.chatId"
+            :content="form.content"
+            @update:content="(val) => (form.content = val)"
           />
         </div>
       </div>
@@ -312,7 +313,7 @@ const onSubmit = async () => {
 
     const newId = res.data.results[0]._id;
 
-    // 👇 attach the temp chat to this new document
+    // attach the temp chat to this new document
     try {
       await api.post(
         `/ai-chat/${workspaceIdComputed.value}/document-ai-chat/attach-temp`,

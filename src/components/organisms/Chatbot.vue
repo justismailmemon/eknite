@@ -1,6 +1,6 @@
 <template>
   <div class="h-full flex flex-col bg-white">
-    <!-- HEADER (molecule) -->
+    <!-- HEADER -->
     <ChatHeader :isBotTyping="isBotTyping" />
 
     <!-- BODY -->
@@ -8,20 +8,28 @@
       <div
         class="h-full rounded-2xl border border-slate-200 bg-white shadow-sm flex flex-col overflow-hidden"
       >
-        <!-- MESSAGES (molecule) -->
-      <div class="h-[calc(100vh-250px)] overflow-hidden flex flex-col">
+        <!-- MESSAGES -->
+        <div class="h-[calc(100vh-250px)] overflow-hidden flex flex-col">
           <ChatMessages
-          ref="messagesRef"
-          :messages="messages"
-          :isBotTyping="isBotTyping"
-          @edit="openEditModal"
-          @delete="openDeleteModal"
-          @copy="copyBotText"
-        />
-      </div>
+            ref="messagesRef"
+            :messages="messages"
+            :isBotTyping="isBotTyping"
+            @edit="openEditModal"
+            @delete="openDeleteModal"
+            @copy="copyBotText"
+            @insert="applyBotAction('insert', $event)"
+            @prepend="applyBotAction('prepend', $event)"
+            @append="applyBotAction('append', $event)"
+            @overwrite="applyBotAction('overwrite', $event)"
+          />
+        </div>
 
-        <!-- INPUT (molecule) -->
-        <ChatInput v-model="userInput" :sending="sending" @send="sendMessage" />
+        <!-- INPUT -->
+        <ChatInput
+          v-model="userInput"
+          :sending="sending"
+          @send="sendMessage"
+        />
       </div>
     </div>
 
@@ -57,19 +65,56 @@ import ChatInput from "@/components/molecules/ChatInput.vue";
 import ConfirmModal from "@/components/molecules/ConfirmModal.vue";
 import EditMessageModal from "@/components/molecules/EditMessageModal.vue";
 
-/** ROUTE / CONTEXT */
+/** PROPS */
+const props = defineProps({
+  workspaceId: {
+    type: String,
+    default: "",
+  },
+  documentId: {
+    type: [String, null],
+    default: null,
+  },
+  chatId: {
+    type: String,
+    default: "",
+  },
+  // document content
+  content: {
+    type: String,
+    default: "",
+  },
+});
+
+/** EMITS */
+const emit = defineEmits(["update:content"]);
+
 const route = useRoute();
-const workspaceId = computed(() => route.params.id || "");
-const documentId = computed(() => {
+
+/** ROUTE FALLBACKS */
+const routeWorkspaceId = computed(() => route.params.id || "");
+const routeDocumentId = computed(() => {
   const q = route.query.id;
   return q && q !== "create-new-document" ? String(q) : null;
+});
+
+/** FINAL workspaceId & documentId */
+const workspaceId = computed(
+  () => props.workspaceId || routeWorkspaceId.value
+);
+
+const documentId = computed(() => {
+  if (props.documentId) return String(props.documentId);
+  return routeDocumentId.value;
 });
 
 /** temp chat id while document not created */
 const tempChatId = ref(`temp-${Date.now()}`);
 
 /** actual chat_id we send to backend */
-const chatId = computed(() => documentId.value || tempChatId.value);
+const chatId = computed(() => {
+  return props.chatId || documentId.value || tempChatId.value;
+});
 
 /** STATE */
 const messages = ref([]);
@@ -100,7 +145,6 @@ onMounted(loadHistory);
 
 async function loadHistory() {
   if (!documentId.value) {
-    // create-new-document: no default bot message
     messages.value = [];
     return;
   }
@@ -165,6 +209,31 @@ const sendMessage = async () => {
   }
 };
 
+/** APPLY BOT TEXT TO DOCUMENT CONTENT TEXTAREA */
+const applyBotAction = (mode, msg) => {
+  const botText = (msg && msg.text) || "";
+  const current = props.content || "";
+  let next = current;
+  const sep = current ? "\n\n" : "";
+
+  switch (mode) {
+    case "insert":
+    case "append":
+      next = current + sep + botText;
+      break;
+    case "prepend":
+      next = botText + (current ? "\n\n" + current : "");
+      break;
+    case "overwrite":
+      next = botText;
+      break;
+    default:
+      return;
+  }
+
+  emit("update:content", next);
+};
+
 /** EDIT FLOW */
 function openEditModal(msg) {
   if (!msg._id) return;
@@ -181,7 +250,7 @@ async function confirmEdit(newText) {
     await api.put(
       `/ai-chat/${workspaceId.value}/document-ai-chat/${msg._id}`,
       { text: newText },
-      { params: { document_id: chatId.value }, skipProgress: true, }
+      { params: { document_id: chatId.value }, skipProgress: true }
     );
     msg.text = newText;
   } catch (err) {
@@ -213,7 +282,7 @@ async function confirmDelete() {
   try {
     const { data } = await api.delete(
       `/ai-chat/${workspaceId.value}/document-ai-chat/${msg._id}`,
-      { params: { document_id: chatId.value }, skipProgress: true, }
+      { params: { document_id: chatId.value }, skipProgress: true }
     );
 
     // Remove this message
